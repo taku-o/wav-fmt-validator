@@ -7,6 +7,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "hoge": "src/hoge.js",
+    "fuga": "bin/fuga.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/taku-o/wav-fmt-validator.git"
