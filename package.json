@@ -1,0 +1,37 @@
+{
+  "name": "wav-fmt-validator",
+  "version": "1.0.0",
+  "description": "wav file format validator.",
+  "main": "validator.js",
+  "types": "types.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/taku-o/wav-fmt-validator.git"
+  },
+  "keywords": [
+    "wav",
+    "javascript",
+    "validator",
+    "test"
+  ],
+  "homepage": "https://github.com/taku-o/wav-fmt-validator#readme",
+  "bugs": {
+    "url": "https://github.com/taku-o/wav-fmt-validator/issues"
+  },
+  "author": "taku-o <mail@nanasi.jp> (https://nanasi.jp/)",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^10.14.5",
+    "@typescript-eslint/parser": "^1.7.0",
+    "eslint": "^5.6.1",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^5.0.0",
+    "gulp-prettier": "^2.1.0",
+    "gulp-typescript": "^5.0.1",
+    "typescript": "^3.4.5"
+  }
+}
