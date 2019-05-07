@@ -41,7 +41,6 @@
     },
     "rules": {
       "comma-dangle": ["error", "always-multiline"],
-      "no-console": "error",
       "no-empty": "error",
       "no-global-assign": "error",
       "no-undef": "off",
