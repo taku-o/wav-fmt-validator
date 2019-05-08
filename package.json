@@ -1,6 +1,6 @@
 {
   "name": "wav-fmt-validator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "wav audio file format validator library for unit test.",
   "main": "validator.js",
   "types": "types.d.ts",

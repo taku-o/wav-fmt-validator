@@ -67,10 +67,13 @@ export class Riff implements Chunk {
     for (let chunk of this.subChunks) {
       sumChunkLength += chunk.chunkLength;
     }
-    // TODO
-    //if ((this.chunkLength - 12) != sumChunkLength) {
-    //  throw new Error(`RIFF chunk chunkLength is not valid length, or sub chunk is broken. invalid format. declared chunkLength:${this.chunkLength}, header size:12, sum chunkLength:${sumChunkLength}`);
-    //}
+    if ((this.chunkLength - 12) != sumChunkLength) {
+      throw new Error(`RIFF chunk chunkLength is not valid length, or sub chunk is broken. invalid format.
+        declared size:${this.size},
+        chunkLength:${this.chunkLength},
+        header size:12,
+        sum chunkLength:${sumChunkLength}`);
+    }
     // sub chunk
     for (let chunk of this.subChunks) {
       if (!chunk.isValid()) {
@@ -205,9 +208,9 @@ class WavData implements Chunk {
     chunk.id = Buffer.from(buffer.readUIntBE(0, 4).toString(16), 'hex').toString();
     // 5-8 Subchunk2 Size
     chunk.size = buffer.readUIntLE(4, 4);
-    chunk.chunkLength = chunk.size + 8;
+    chunk.chunkLength = chunk.size + 8
     // 9-   Subchunk2 data
-    chunk.wavBuffer = buffer.slice(8, chunk.size);
+    chunk.wavBuffer = buffer.slice(8, chunk.size + 8);
     // return
     return chunk;
   }
@@ -220,10 +223,13 @@ class WavData implements Chunk {
       throw new Error(`data chunk id is not data. invalid format. id:${this.id}`);
     }
     // length
-    // TODO
-    //if (this.wavBuffer.length != this.size) {
-    //  throw new Error(`data chunk chunkLength is not valid length. invalid format. declared chunkLength:${this.chunkLength}, header size:8, buffer length:${this.wavBuffer.length}`);
-    //}
+    if (this.wavBuffer.length != this.size) {
+      throw new Error(`data chunk chunkLength is not valid length. invalid format.
+        declared size:${this.size},
+        chunkLength:${this.chunkLength},
+        header size:8,
+        buffer length:${this.wavBuffer.length}`);
+    }
     return true;
   }
   dump(offset: number): any {
