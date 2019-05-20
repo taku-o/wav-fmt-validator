@@ -18,6 +18,9 @@ export class Riff implements Chunk {
 
   constructor() {}
   static isChunk(buffer: Buffer) {
+    if (buffer.length < 4) {
+      return false;
+    }
     const id = buffer.readUIntBE(0, 4);
     const idName = Buffer.from(id.toString(16), 'hex').toString();
     return idName == 'RIFF';
@@ -44,6 +47,11 @@ export class Riff implements Chunk {
         chunk.subChunks.push(sub);
         pos += sub.chunkLength;
         continue;
+      } else if (iXMLChunk.isChunk(buffer.slice(pos))) {
+        const sub = iXMLChunk.from(buffer.slice(pos));
+        chunk.subChunks.push(sub);
+        pos += sub.chunkLength;
+        continue;
       } else {
         break;
       }
@@ -62,7 +70,13 @@ export class Riff implements Chunk {
     if (this.format != 'WAVE') {
       throw new Error(`RIFF chunk format is not WAVE. invalid format. format:${this.format}`);
     }
-    // length
+    // sub chunk
+    for (let chunk of this.subChunks) {
+      if (!chunk.isValid()) {
+        return false;
+      }
+    }
+    // total length
     let sumChunkLength = 0;
     for (let chunk of this.subChunks) {
       sumChunkLength += chunk.chunkLength;
@@ -74,18 +88,13 @@ export class Riff implements Chunk {
         header size:12,
         sum chunkLength:${sumChunkLength}`);
     }
-    // sub chunk
-    for (let chunk of this.subChunks) {
-      if (!chunk.isValid()) {
-        return false;
-      }
-    }
     return true;
   }
   dump(offset: number): any {
-    if (!this.isValid()) {
-      return false;
-    }
+    // TODO
+    //if (!this.isValid()) {
+    //  return false;
+    //}
     let tables = [];
     tables.push({position: offset, length: 4, header: 'Chunk ID "RIFF"', data: this.id});
     tables.push({position: offset + 4, length: 4, header: 'Chunk Size', data: this.size});
@@ -117,6 +126,9 @@ class Fmt implements Chunk {
 
   constructor() {}
   static isChunk(buffer: Buffer) {
+    if (buffer.length < 4) {
+      return false;
+    }
     const id = buffer.readUIntBE(0, 4);
     const idName = Buffer.from(id.toString(16), 'hex').toString();
     return idName == 'fmt ';
@@ -171,9 +183,10 @@ class Fmt implements Chunk {
     return true;
   }
   dump(offset: number): any {
-    if (!this.isValid()) {
-      return false;
-    }
+    // TODO
+    //if (!this.isValid()) {
+    //  return false;
+    //}
     let tables = [];
     tables.push({position: offset, length: 4, header: 'Subchunk1 ID "fmt "', data: this.id});
     tables.push({position: offset + 4, length: 4, header: 'Subchunk1 Size', data: this.size});
@@ -198,6 +211,9 @@ class WavData implements Chunk {
 
   constructor() {}
   static isChunk(buffer: Buffer) {
+    if (buffer.length < 4) {
+      return false;
+    }
     const id = buffer.readUIntBE(0, 4);
     const idName = Buffer.from(id.toString(16), 'hex').toString();
     return idName == 'data';
@@ -233,13 +249,75 @@ class WavData implements Chunk {
     return true;
   }
   dump(offset: number): any {
-    if (!this.isValid()) {
-      return false;
-    }
+    // TODO
+    //if (!this.isValid()) {
+    //  return false;
+    //}
     let tables = [];
     tables.push({position: offset, length: 4, header: 'Subchunk2 ID "data"', data: this.id});
     tables.push({position: offset + 4, length: 4, header: 'Subchunk2 Size', data: this.size});
     tables.push({position: offset + 8, length: this.size, header: 'Wave Data', data: '******'});
+    return tables;
+  }
+}
+
+/**
+ * iXML Chunk
+ */
+class iXMLChunk implements Chunk {
+  chunkLength: number;
+  id: string;
+  size: number;
+  wavBuffer: Buffer;
+
+  constructor() {}
+  static isChunk(buffer: Buffer) {
+    if (buffer.length < 4) {
+      return false;
+    }
+    const id = buffer.readUIntBE(0, 4);
+    const idName = Buffer.from(id.toString(16), 'hex').toString();
+    return idName == 'iXML';
+  }
+  static from(buffer: Buffer) {
+    const chunk = new iXMLChunk();
+    // 1-4 Subchunk2 ID "iXML"
+    chunk.id = Buffer.from(buffer.readUIntBE(0, 4).toString(16), 'hex').toString();
+    // 5-8 Subchunk2 Size
+    chunk.size = buffer.readUIntLE(4, 4);
+    chunk.chunkLength = chunk.size + 8
+    // 9-   Subchunk2 data
+    chunk.wavBuffer = buffer.slice(8, chunk.size + 8);
+    // return
+    return chunk;
+  }
+  isValid(): boolean {
+    // value
+    if (!Boolean(this.id && this.size && this.wavBuffer)) {
+      throw new Error('iXML chunk id, size or data is not contained. invalid format.');
+    }
+    if (this.id != 'iXML') {
+      throw new Error(`iXML chunk id is not iXML. invalid format. id:${this.id}`);
+    }
+    // length
+    if (this.wavBuffer.length != this.size) {
+      throw new Error(`iXML chunk chunkLength is not valid length. invalid format.
+        declared size:${this.size},
+        chunkLength:${this.chunkLength},
+        header size:8,
+        buffer length:${this.wavBuffer.length}`);
+    }
+    return true;
+  }
+  dump(offset: number): any {
+    // TODO
+    //if (!this.isValid()) {
+    //  return false;
+    //}
+    let tables = [];
+    tables.push({position: offset, length: 4, header: 'iXML Chumk ID', data: this.id});
+    tables.push({position: offset + 4, length: 4, header: 'iXML Chunk Size', data: this.size});
+    tables.push({position: offset + 8, length: this.size, header: 'Chunk Data', data: this.wavBuffer.toString()});
     return tables;
   }
 }
