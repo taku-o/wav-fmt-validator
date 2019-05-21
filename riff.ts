@@ -3,7 +3,7 @@ interface Chunk {
   id: string;
   size: number;
   isValid(): boolean;
-  dump(offset: number): any;
+  dump(offset: number, force: boolean): any;
 }
 
 /**
@@ -90,11 +90,12 @@ export class Riff implements Chunk {
     }
     return true;
   }
-  dump(offset: number): any {
-    // TODO
-    //if (!this.isValid()) {
-    //  return false;
-    //}
+  dump(offset: number, force: boolean = false): any {
+    if (!force) {
+      if (!this.isValid()) {
+        return false;
+      }
+    }
     let tables = [];
     tables.push({position: offset, length: 4, header: 'Chunk ID "RIFF"', data: this.id});
     tables.push({position: offset + 4, length: 4, header: 'Chunk Size', data: this.size});
@@ -102,7 +103,7 @@ export class Riff implements Chunk {
 
     offset = 12;
     for (let chunk of this.subChunks) {
-      let tableInfos = chunk.dump(offset);
+      let tableInfos = chunk.dump(offset, force);
       tables = tables.concat(tableInfos);
       offset += chunk.chunkLength;
     }
@@ -182,11 +183,12 @@ class Fmt implements Chunk {
     }
     return true;
   }
-  dump(offset: number): any {
-    // TODO
-    //if (!this.isValid()) {
-    //  return false;
-    //}
+  dump(offset: number, force: boolean = false): any {
+    if (!force) {
+      if (!this.isValid()) {
+        return false;
+      }
+    }
     let tables = [];
     tables.push({position: offset, length: 4, header: 'Subchunk1 ID "fmt "', data: this.id});
     tables.push({position: offset + 4, length: 4, header: 'Subchunk1 Size', data: this.size});
@@ -248,11 +250,12 @@ class WavData implements Chunk {
     }
     return true;
   }
-  dump(offset: number): any {
-    // TODO
-    //if (!this.isValid()) {
-    //  return false;
-    //}
+  dump(offset: number, force: boolean = false): any {
+    if (!force) {
+      if (!this.isValid()) {
+        return false;
+      }
+    }
     let tables = [];
     tables.push({position: offset, length: 4, header: 'Subchunk2 ID "data"', data: this.id});
     tables.push({position: offset + 4, length: 4, header: 'Subchunk2 Size', data: this.size});
@@ -309,11 +312,12 @@ class iXMLChunk implements Chunk {
     }
     return true;
   }
-  dump(offset: number): any {
-    // TODO
-    //if (!this.isValid()) {
-    //  return false;
-    //}
+  dump(offset: number, force: boolean = false): any {
+    if (!force) {
+      if (!this.isValid()) {
+        return false;
+      }
+    }
     let tables = [];
     tables.push({position: offset, length: 4, header: 'iXML Chumk ID', data: this.id});
     tables.push({position: offset + 4, length: 4, header: 'iXML Chunk Size', data: this.size});

@@ -86,16 +86,16 @@ describe('validator', () => {
   });
 
   // TODO
-  //it('should validate wav audio file with iXML chunk.', (cb) => {
-  //  const wavFile = './test/with-ixml-left.wav';
-  //  fs.readFile(wavFile, 'binary', (err, content) => {
-  //    if (err) {
-  //      return cb(err);
-  //    }
-  //    let buffer = Buffer.from(content, 'binary');
-  //    const result = wavValidator(buffer);
-  //    assert.ok(result);
-  //    cb();
-  //  });
-  //});
+  it('should validate wav audio file with iXML chunk.', (cb) => {
+    const wavFile = './test/with-ixml-left.wav';
+    fs.readFile(wavFile, 'binary', (err, content) => {
+      if (err) {
+        return cb(err);
+      }
+      let buffer = Buffer.from(content, 'binary');
+      const result = wavValidator(buffer);
+      assert.ok(result);
+      cb();
+    });
+  });
 });

@@ -74,14 +74,19 @@ class Riff {
         }
         return true;
     }
-    dump(offset) {
+    dump(offset, force = false) {
+        if (!force) {
+            if (!this.isValid()) {
+                return false;
+            }
+        }
         let tables = [];
         tables.push({ position: offset, length: 4, header: 'Chunk ID "RIFF"', data: this.id });
         tables.push({ position: offset + 4, length: 4, header: 'Chunk Size', data: this.size });
         tables.push({ position: offset + 8, length: 4, header: 'Format "WAVE"', data: this.format });
         offset = 12;
         for (let chunk of this.subChunks) {
-            let tableInfos = chunk.dump(offset);
+            let tableInfos = chunk.dump(offset, force);
             tables = tables.concat(tableInfos);
             offset += chunk.chunkLength;
         }
@@ -138,7 +143,12 @@ class Fmt {
         }
         return true;
     }
-    dump(offset) {
+    dump(offset, force = false) {
+        if (!force) {
+            if (!this.isValid()) {
+                return false;
+            }
+        }
         let tables = [];
         tables.push({ position: offset, length: 4, header: 'Subchunk1 ID "fmt "', data: this.id });
         tables.push({ position: offset + 4, length: 4, header: 'Subchunk1 Size', data: this.size });
@@ -187,7 +197,12 @@ class WavData {
         }
         return true;
     }
-    dump(offset) {
+    dump(offset, force = false) {
+        if (!force) {
+            if (!this.isValid()) {
+                return false;
+            }
+        }
         let tables = [];
         tables.push({ position: offset, length: 4, header: 'Subchunk2 ID "data"', data: this.id });
         tables.push({ position: offset + 4, length: 4, header: 'Subchunk2 Size', data: this.size });
@@ -229,7 +244,12 @@ class iXMLChunk {
         }
         return true;
     }
-    dump(offset) {
+    dump(offset, force = false) {
+        if (!force) {
+            if (!this.isValid()) {
+                return false;
+            }
+        }
         let tables = [];
         tables.push({ position: offset, length: 4, header: 'iXML Chumk ID', data: this.id });
         tables.push({ position: offset + 4, length: 4, header: 'iXML Chunk Size', data: this.size });
